@@ -1,0 +1,60 @@
+# istioIngressGatewayName represents name of the shared Istio Gateway to expose Harbor through
+istioIngressGatewayName: ingressgateway
+
+# domain value is domain name to use for Harbor
+domain: localhost
+
+# customTlsCertFile and customTlsKeyFile represent paths to custom TLS certificate and certificate key 
+# files to use for HTTPS instead of automatically generated self-signed certificate
+nginxTlsCertFile:
+nginxTlsKeyFile:
+
+# If you want to use local PV, make sure to set all of the following values
+# harbor.persistence.persistentVolumeClaim.registry.existingClaim
+# harbor.persistence.persistentVolumeClaim.registry.subPath
+# harbor.persistence.persistentVolumeClaim.jobservice.jobLog.existingClaim
+# harbor.persistence.persistentVolumeClaim.jobservice.jobLog.subPath
+# harbor.persistence.persistentVolumeClaim.database.existingClaim
+# harbor.persistence.persistentVolumeClaim.database.subPath
+# harbor.persistence.persistentVolumeClaim.redis.existingClaim
+# harbor.persistence.persistentVolumeClaim.redis.subPath
+# harbor.persistence.persistentVolumeClaim.trivy.existingClaim
+# harbor.persistence.persistentVolumeClaim.trivy.subPath
+# existingClaim value must be the same for all as there will be single PV/PVC created for all components, 
+# and for the same reason subPath should be different in each case
+# make sure to create all of the folders manually beforehand and 
+# have subPath folders ownership set in accordance with securityContext of corresponding components 
+# (database and redis have user and group set as 999, and everything else is 10000)
+localPV:
+  enabled: false
+  storageClassName: local-storage
+  path:
+  affinityHostname:
+  storageCapacity: 20Gi
+
+# harbor sub-chart values
+harbor:
+  expose:
+    type: clusterIP
+    tls:
+      certSource: secret
+      secret:
+        secretName: harbor-nginx-tls
+  persistence:
+    persistentVolumeClaim:
+      registry:
+        existingClaim:
+        subPath:
+      jobservice:
+        jobLog:
+          existingClaim:
+          subPath:
+      database:
+        existingClaim:
+        subPath:
+      redis:
+        existingClaim:
+        subPath:
+      trivy:
+        existingClaim:
+        subPath:

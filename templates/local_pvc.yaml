@@ -1,0 +1,17 @@
+{{- if .Values.localPV.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  {{/* Using claim name from registry, BUT assuming that all components will use the same single PV/PVC */}}
+  name: {{ .Values.harbor.persistence.persistentVolumeClaim.registry.existingClaim }}
+  labels:
+{{ include "harbor.labels" .Subcharts.harbor | indent 4 }}
+spec:
+  volumeName: {{ .Values.harbor.persistence.persistentVolumeClaim.registry.existingClaim }}
+  storageClassName: {{ .Values.localPV.storageClassName | quote }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.localPV.storageCapacity }}
+{{- end -}}

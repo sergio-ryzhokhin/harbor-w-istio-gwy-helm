@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ template "harbor.nginx" .Subcharts.harbor }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+{{ include "harbor.labels" .Subcharts.harbor | indent 4 }}
+spec:
+  hosts:
+    - {{ .Values.domain }}
+  gateways:
+    - {{ template "harbor.nginx" .Subcharts.harbor }}
+  tls:
+    - match:
+      - port: 443
+        sniHosts:
+          - {{ .Values.domain }}
+      route:
+        - destination:
+            host: {{ .Values.harbor.expose.clusterIP.name }}
+            port:
+              number: 443

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: harbor-w-istio-gwy
+version: 0.0.1
+description: Helm chart to install Harbor exposed through Istio Ingress Gateway 
+kubeVersion: ">=1.21.0-0"
+dependencies:
+  - name: harbor
+    version: ">=1.18.0"
+    repository: https://helm.goharbor.io

@@ -1,0 +1,27 @@
+{{- if .Values.localPV.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  {{/* Using claim name from registry, BUT assuming that all components will use the same single PV/PVC */}}
+  name: {{ .Values.harbor.persistence.persistentVolumeClaim.registry.existingClaim }}
+  labels:
+{{ include "harbor.labels" .Subcharts.harbor | indent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: {{ .Values.localPV.storageCapacity }}
+  volumeMode: Filesystem
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: {{ .Values.localPV.storageClassName | quote }}
+  local:
+    path: {{ required "Path for Local Persistent Volume is required." .Values.localPV.path | quote }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - {{ required "Hostname for node affinity of Local Persistent Volume is required." .Values.localPV.affinityHostname | quote }}
+{{- end -}}
